@@ -172,6 +172,14 @@ class docsmit(object):
         """
         function = "account"
 
+    #Miscellaneous
+
+    def cassCheck(self):
+        """
+        GET /utils/multiCASS
+        CASS validate and correct an address
+        """
+        function = "utils"
 
     #Packet and connection handling
     
