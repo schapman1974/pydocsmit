@@ -52,7 +52,6 @@ class docsmit(object):
         """
         function = "token"
         result = self._sendRequest({"function":function,"method":"POST","email":self.username,"password":self.password,"softwareID":self.softwareid})
-        print result
         if "token" in result:
             self._token = base64.b64encode(result["token"]+":")
         else:
@@ -73,12 +72,51 @@ class docsmit(object):
 
     #Messages - Before Sending
 
-    def newMessage(self):
+    def newMessage(self,mailObject):
         """
         POST /messages/new 
         new message
         """
-        function = "messages"
+        function = "messages/new"
+        result = self._sendRequest({"function":function,"method":"POST","packet":mailObject})
+        print result
+        
+    def genMailObject(self,title,physicalParties,rtnName,rtnOrganization,rtnAddress1,rtnAddress2,rtnCity,rtnState,rtnZip,SASE=0,callbackURIs={},billTo=""):
+        """
+        generate a dictionary object for the new message mailing
+        """
+        mailObj = {"title":title,
+                   "physicalParties":physicalParties,
+                   "rtnName":rtnName,
+                   "rtnOrganization":rtnOrganization,
+                   "rtnAddress1":rtnAddress1,
+                   "rtnAddress2":rtnAddress2,
+                   "rtnCity":rtnCity,
+                   "rtnState":rtnState,
+                   "rtnZip":rtnZip,
+                   "SASE":SASE,
+                   "callbackURIs":callbackURIs,
+                   "billTo":billTo}
+        return mailObj
+ 
+    def genPartyObject(self,firstName,lastName,organization,address1,address2,city,state,postalCode,sendType,envelope,sided=1,plusRegular=0):
+        """
+        generate a dictionary object for each customer party receving the mailing
+        """
+        partyObj = {
+                   "firstName":firstName,
+                   "lastName":lastName,
+                   "organization":organization,
+                   "address1":address1,
+                   "address2":address2,
+                   "city":city,
+                   "state":state,
+                   "postalCode":postalCode,
+                   "sendType":sendType,
+                   "envelope":envelope,
+                   "sided":sided,
+                   "plusRegular":plusRegular}
+        return partyObj
 
     def uploadFile(self,messageID,filename):
         """
@@ -89,6 +127,7 @@ class docsmit(object):
         print mimetypes.guess_type(filename)
         fileData = file_get_contents(filename)
         function = "messages"
+        raise NotImplementedError("uploadFile")
 
     def sendMessage(self,messageID):
         """
@@ -96,6 +135,7 @@ class docsmit(object):
         send message
         """
         function = "messages"
+        raise NotImplementedError("sendMessage")
 
     def addParty(self,messageID):
         """
@@ -103,6 +143,7 @@ class docsmit(object):
         add party
         """
         function = "messages"
+        raise NotImplementedError("addParty")
 
     def deleteParty(self,messageID,partyID):
         """
@@ -110,6 +151,7 @@ class docsmit(object):
         delete party
         """
         function = "messages"
+        raise NotImplementedError("deleteParty")
 
     def updateParty(self,messageID,partyID):
         """
@@ -117,6 +159,7 @@ class docsmit(object):
         update party
         """
         function = "messages"
+        raise NotImplementedError("updateParty")
 
     def priceCheck(self,messageID):
         """
@@ -124,6 +167,7 @@ class docsmit(object):
         get the price and the details
         """
         function = "messages"
+        raise NotImplementedError("priceCheck")
 
     #Messages - After Sending
 
@@ -133,6 +177,7 @@ class docsmit(object):
         get a message
         """
         function = "messages"
+        raise NotImplementedError("getMessage")
 
     def signFor(self,messageID):
         """
@@ -140,6 +185,7 @@ class docsmit(object):
         sign for message
         """
         function = "messages"
+        raise NotImplementedError("signFor")
 
     def getCertification(self,messageID):
         """
@@ -251,8 +297,11 @@ class docsmit(object):
         function = request["function"]
         method = "POST"
         if "method" in request:method = request["method"]
-        del request["function"]
-        del request["method"]
+        if "packet" in request:
+            request=request["packet"]
+        else:
+            del request["function"]
+            del request["method"]
         if request!={}:
             reqdat = json.dumps(request)
         else:
