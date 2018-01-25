@@ -142,6 +142,37 @@ class docsmit(object):
         """
         function = "messages"
 
+    #Account functions
+
+    def sentList(self):
+        """
+        GET /messages/sent/
+        sent list
+        """
+        function = "messages"
+
+    def inboxList(self):
+        """
+        GET /messages/inbox
+        inbox list
+        """
+        function = "messages"
+
+    def draftList(self):
+        """
+        GET /messages/draft
+        draft list
+        """
+        function = "messages"
+
+    def accountInfo(self):
+        """
+        GET /account/info
+        user account information
+        """
+        function = "account"
+
+
     #Packet and connection handling
     
     def _sendRequest(self,request):
